@@ -1,0 +1,8 @@
+inventory.txt 0
+work/25090012035/input/tmp/empty.txt 0
+work/25090012035/input/docs/notes one.txt 11
+work/25090012035/input/docs/.secret.txt 7
+input/tmp/empty.txt 0
+input/tmp/run.log 67
+input/docs/notes one.txt 11
+input/docs/.secret.txt 7
