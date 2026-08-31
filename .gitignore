@@ -1,2 +1,12 @@
 week1/q03/.git
 week1/q03/.git/
+
+week2/q06/venv/
+week2/q06/env/
+week2/q06/.venv/
+week2/q06/__pycache__/
+week2/q06/*.pyc
+week2/q06/.pytest_cache/
+week2/q06/.ruff_cache/
+week2/q06/*.swp
+week2/q06/*.swo
