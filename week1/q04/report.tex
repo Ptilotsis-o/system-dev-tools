@@ -1,9 +1,30 @@
 \documentclass{article}
 \usepackage{amsmath}
+\usepackage{ctex}
 \begin{document}
 \title{Tool Report}
-\author{姓名—学号}
+\author{乔海轩—25090012035}
 \maketitle
 \section{Result}
-% 在此加入公式、表格及正文引用
+勾股定理公式，如公式 \eqref{eq:pythagoras} 所示。
+\begin{equation}
+    a^2 + b^2 = c^2
+    \label{eq:pythagoras}
+\end{equation}
+
+该公式描述了直角三角形三边的关系。
+表 \ref{tab:scores} 展示了两个样本的测试数据。
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline
+        项目名称 & 数值 \\
+        \hline
+        Alpha   & 10.5 \\
+        Beta    & 20.3 \\
+        \hline
+    \end{tabular}
+    \caption{这是两个样本的测试数据}
+    \label{tab:scores}
+\end{table}
 \end{document}
