@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "greetlab-25090012035"
+version = "0.1.0"
+[project.scripts]
+sdt-greet = "greetlab.cli:main"
+[tool.ruff]
+target-version = "Python 3.14.4"    
+line-length = 88              
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]   # E: pycodestyle错误, F: pyflakes, W: pycodestyle警告, I: isort导入排序
+ignore = []                   
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]      
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
