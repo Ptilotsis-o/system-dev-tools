@@ -7,7 +7,7 @@ version = "0.1.0"
 [project.scripts]
 sdt-greet = "greetlab.cli:main"
 [tool.ruff]
-target-version = "Python 3.14.4"    
+target-version = "py314"    
 line-length = 88              
 
 [tool.ruff.lint]
