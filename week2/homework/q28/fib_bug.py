@@ -1,4 +1,5 @@
 def fib(n):
+    breakpoint()
     if n < 2:        # 错误
         return 1
     return fib(n-1) + fib(n-2)
