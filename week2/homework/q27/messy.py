@@ -1,5 +1,9 @@
-import   os,sys
-x=1
-y=2
-def foo():return x+y
-print( foo( ) )
+x = 1
+y = 2
+
+
+def foo():
+    return x + y
+
+
+print(foo())
