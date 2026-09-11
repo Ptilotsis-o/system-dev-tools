@@ -1,6 +1,7 @@
 def safe_insert(arr, idx, val):
-    if idx < 0 or idx > len(arr):
-        raise IndexError("Index out of range")   # 故意在这里抛出
-    arr.insert(idx, val)
-
-safe_insert([1,2,3], 5, 99)   # 触发异常
+    if idx < 0:
+        arr.insert(0, val)
+    elif idx >= len(arr):
+        arr.append(val)
+    else:
+        arr.insert(idx, val)
