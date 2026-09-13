@@ -10,4 +10,4 @@ def main():
     if not a.name.strip():
         sys.exit(2)
 
-    print(f"Hello, {a.name}!")
+    print("Hello, name!")
