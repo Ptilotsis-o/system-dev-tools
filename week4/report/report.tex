@@ -1,0 +1,271 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{minted}
+\usepackage[htt]{hyphenat}
+\usepackage[UTF8]{ctex}
+
+\hypersetup{
+  colorlinks=true,
+  allcolors=blue,
+  pdfstartview=Fit,
+  breaklinks=true
+}
+
+\newcommand{\figph}[2][0.8\textwidth]{%
+  \IfFileExists{figures/#2}%
+    {\includegraphics[width=#1]{figures/#2}}%
+    {\fbox{\parbox[c][4cm][c]{0.75\textwidth}{\centering\ttfamily [图片占位符]\quad\detokenize{figures/#2}}}}%
+}
+
+\sloppy
+
+\begin{document}
+  \title{系统开发工具基础 \\ 第四周实验报告}
+  \author{乔海轩—25090012035}
+  \date{2026年9月14日}
+  \maketitle
+
+  \tableofcontents
+  \newpage
+
+  \section{总览}
+    \begin{table}[h]
+      \centering
+      \begin{tabular}{|l|l|c|}
+        \hline
+        题目编号 & 描述 & 完成情况 \\
+        \hline
+        13 & 建立可执行的本地质量门禁 & 已完成 \\
+        14 & 让 Make 只重建真正受影响的产物 & 已完成 \\
+        15 & 把本地 API 数据转换为可读报告 & 已完成 \\
+        16 & 修复并交付一个陌生的小型工具仓库 & 已完成 \\
+        \hline
+      \end{tabular}
+    \end{table}
+    Github 仓库地址：\href{https://github.com/Ptilotsis-o/system-dev-tools/}{https://github.com/Ptilotsis-o/system-dev-tools/}
+    \newline Commit记录如图\ref{fig:commit1}和\ref{fig:commit2}所示。
+    \begin{figure}[h]
+      \centering
+      \figph{commit1.png}
+      \caption{Commit记录截图}
+      \label{fig:commit1}
+    \end{figure}
+    \begin{figure}[h]
+      \centering
+      \figph{commit2.png}
+      \caption{Commit记录截图}
+      \label{fig:commit2}
+    \end{figure}
+
+  \newpage
+  \section{第 13 题 建立可执行的本地质量门禁}
+    \subsection*{题目要求}
+      \begin{itemize}
+        \item 复制 q10 为 q13；在 pyproject.toml 中加入 ruff 和 pytest 的最小配置。
+        \item 补充一个正常姓名测试和一个空白姓名测试，每个测试包含有效断言。
+        \item 运行 ruff format、ruff check 和 pytest，修复全部问题，不得全局忽略规则。
+        \item 编写 check.sh，依次执行 ruff format --check、ruff check 和 pytest；运行并保证返回 0。
+      \end{itemize}
+    \subsection*{操作步骤与命令}
+      \begin{minted}{bash}
+        cp -r ../week3/q10 q13
+        cd q13
+        vim pyproject.toml
+        vim tests/test_cli.py
+        ruff format .
+        ruff check .
+        pytest -v
+        vim check.sh
+        chmod +x check.sh
+        ./check.sh
+        echo $?
+      \end{minted}
+    \subsection*{结果验证}
+      \begin{itemize}
+        \item pyproject.toml 中加入 ruff 最小配置（target-version、line-length、lint 的 select 列表，ignore 为空）与 pytest 最小配置（testpaths 为 tests）；
+        \item \texttt{test\_normal\_name} 与 \texttt{test\_blank\_name\_exits} 各自包含有效断言，均通过；
+        \item \texttt{ruff format}、\texttt{ruff check} 无任何报错，未使用全局忽略规则；
+        \item check.sh 依次执行 \texttt{ruff format --check}、\texttt{ruff check} 与 \texttt{pytest}，运行结束打印 All checks passed，\texttt{echo \$?} 输出 0。
+      \end{itemize}
+      \begin{figure}[h]
+        \centering
+        \figph{ruff.png}
+        \caption{ruff format , ruff check 与 pytest 输出截图}
+        \label{fig:ruff}
+      \end{figure}
+      \begin{figure}[h]
+        \centering
+        \figph{checksh.png}
+        \caption{check.sh 运行及退出码截图}
+        \label{fig:checksh}
+      \end{figure}
+
+  \newpage
+  \section{第 14 题 让 Make 只重建真正受影响的产物}
+    \subsection*{题目要求}
+      \begin{itemize}
+        \item 创建给定的 data.csv、stats.py、build\_report.py 和 report.md。
+        \item 编写 Makefile，包含 all、stats.txt、report.txt 和 clean；准确列出数据文件、脚本和中间产物依赖，并把 all、clean 声明为 .PHONY。
+        \item 验证首次 make 生成两个产物；第二次无改动时不执行配方。
+        \item touch data.csv 后再次 make，确认 stats.txt 和 report.txt 重新生成；clean 只删除生成物。
+      \end{itemize}
+    \subsection*{操作步骤与命令}
+      \begin{minted}{bash}
+        vim data.csv stats.py build_report.py report.md
+        vim Makefile
+        make
+        make
+        touch data.csv
+        make
+        make clean
+        ls
+      \end{minted}
+    \subsection*{结果验证}
+      \begin{itemize}
+        \item 依赖关系准确：\texttt{stats.txt} 依赖 \texttt{data.csv} 与 \texttt{stats.py}，\texttt{report.txt} 依赖 \texttt{report.md} 与 \texttt{stats.txt}；all、clean 已声明为 \texttt{.PHONY}；
+        \item 首次 \texttt{make} 由 data.csv 计算得到 stats.txt（内容为 10），再生成 report.txt；
+        \item 第二次 \texttt{make} 未执行任何配方，只提示 \texttt{'stats.txt' is up to date}；
+        \item \texttt{touch data.csv} 后再次 \texttt{make}，stats.txt 与 report.txt 均重新生成，时间戳更新；
+        \item \texttt{make clean} 只删除 stats.txt 与 report.txt，源文件与 Makefile 保留。
+      \end{itemize}
+      \begin{figure}[h]
+        \centering
+        \figph{make.png}
+        \caption{首次 make 生成两个产物截图和第二次 make 不执行配方截图}
+        \label{fig:make}
+      \end{figure}
+      \begin{figure}[h]
+        \centering
+        \figph{makeagain.png}
+        \caption{touch 后重新生成截图}
+        \label{fig:makeagain}
+      \end{figure}
+
+  \newpage
+  \section{第 15 题 把本地 API 数据转换为可读报告}
+    \subsection*{题目要求}
+      \begin{itemize}
+        \item 把给定 JSON 保存为 packages.json，并在 q15 目录运行 python -m http.server 8000。
+        \item 使用 curl -fsS 获取 http://127.0.0.1:8000/packages.json。
+        \item 使用 jq 筛选 status 为 active 且 downloads 不少于 100 的记录，并按 downloads 降序、name 升序排列。
+        \item 编写 api\_report.sh，把结果生成 summary.md，包含标题和 name、version、downloads 三列表格。
+      \end{itemize}
+    \subsection*{操作步骤与命令}
+      \begin{minted}{bash}
+        vim packages.json
+        python -m http.server 8000 &
+        curl -fsS http://127.0.0.1:8000/packages.json
+        vim api_report.sh
+        chmod +x api_report.sh
+        ./api_report.sh
+        cat summary.md
+      \end{minted}
+    \subsection*{结果验证}
+      \begin{itemize}
+        \item packages.json 保存正确，\texttt{python -m http.server 8000} 在 q15 目录提供该文件；
+        \item \texttt{curl -fsS} 成功取回 JSON 内容，未依赖浏览器或手工复制；
+        \item jq 筛选出 alpha、gamma、delta 三条记录（beta 为 inactive、epsilon 下载量不足 100 被排除），排序为 downloads 降序、同值按 name 升序：delta（450）、gamma（450）、alpha（120）；
+        \item summary.md 包含标题 \texttt{\# Active Packages} 与 name、version、downloads 三列表格，共三行数据，与 api\_report.sh 的输出一致。
+      \end{itemize}
+      \begin{figure}[h]
+        \centering
+        \figph{server.png}
+        \caption{http.server截图}
+        \label{fig:server}
+      \end{figure}
+      \begin{figure}[h]
+        \centering
+        \figph{crul.png}
+        \caption{crul捕获截图}
+        \label{fig:curl}
+      \end{figure}
+      \begin{figure}[h]
+        \centering
+        \figph{summary.png}
+        \caption{summary.md 内容截图}
+        \label{fig:summary}
+      \end{figure}
+
+  \newpage
+  \section{第 16 题 修复并交付一个陌生的小型工具仓库}
+    \subsection*{题目要求}
+      \begin{itemize}
+        \item 复制 q13 为 q16 并初始化/继续使用 Git。
+        \item 把问候语实现临时改成始终返回字面量 Hello, name!，运行 check.sh 确认测试失败；随后定位并修复。
+        \item 编写最小 Makefile，包含 check、build 和 clean；check 调用 check.sh、build 生成 wheel。
+        \item 运行 make check 和 make build，计算 wheel 的 SHA-256，并把最终改动提交为一个内容聚焦的 Git 提交。
+      \end{itemize}
+    \subsection*{操作步骤与命令}
+      \begin{minted}{bash}
+        cp -r q13 q16
+        cd q16
+        git init
+        git add -A
+        git commit -m "chore: import greetlab from q13"
+        vim src/greetlab/cli.py # 临时改动
+        ./check.sh
+        vim src/greetlab/cli.py # 修复
+        ./check.sh
+        vim Makefile
+        make check
+        make build
+        sha256sum dist/greetlab_25090012035-0.1.0-py3-none-any.whl
+        git add -A
+        git commit -m "···"
+      \end{minted}
+    \subsection*{结果验证}
+      \begin{itemize}
+        \item q16 由 q13 复制而来并纳入 Git 管理；
+        \item 临时改动后 check.sh 返回非 0，\texttt{test\_normal\_name} 断言失败，实际输出为 \texttt{Hello, name!} 而非 \texttt{Hello, Alice!}；
+        \item 修复后 \texttt{make check} 返回 0，ruff format --check、ruff check 与 pytest 全部通过；
+        \item \texttt{make build} 生成 \allowbreak\texttt{greetlab\_25090012035-0.1.0-py3-none-any.whl}，并计算出该 wheel 的 SHA-256；
+        \item 最终改动以单个内容聚焦的提交入库（\texttt{fix(cli): restore blank-name validation}）。
+      \end{itemize}
+      \begin{figure}[h]
+        \centering
+        \figph{fail.png}
+        \caption{临时改动后 check.sh 测试失败截图}
+        \label{fig:fail}
+      \end{figure}
+      \begin{figure}[h]
+        \centering
+        \figph{check.png}
+        \caption{make check 输出截图}
+        \label{fig:makecheck}
+      \end{figure}
+      \begin{figure}[h]
+        \centering
+        \figph{sha.png}
+        \caption{wheel 的 SHA-256 计算结果截图}
+        \label{fig:sha}
+      \end{figure}
+      \begin{figure}[h]
+        \centering
+        \figph{q16commit.png}
+        \caption{最终 Git 提交记录截图}
+        \label{fig:q16commit}
+      \end{figure}
+
+  \iffalse
+  \newpage
+  \section{课后作业}
+    \subsection{q1: 待补充}
+    待补充
+      \begin{minted}{bash}
+        # 待补充
+      \end{minted}
+    \subsection{课后作业commit记录}
+      \begin{figure}[h]
+        \centering
+        \figph{homework_commit.png}
+        \caption{课后作业commit记录}
+        \label{fig:homework_commit}
+      \end{figure}
+
+  \section{解题感悟}
+    待补充
+
+  \fi
+\end{document}

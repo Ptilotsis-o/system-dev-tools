@@ -1,22 +1,22 @@
 ## issue
 
-** 环境 **
+**环境**
 - 操作系统：待确认（已报告windows）
 - 包版本：greetlab\_25090012035-0.1.0  
 - python版本：待确认
 
-** 复现步骤 ** 
+**复现步骤** 
 1. 安装 wheel 后执行：`sdt-greet --name "   "`
 
-** 预期结果 **
+**预期结果**
 程序应校验输入，当`--name`仅包含空白字符时，以非零退出码（建议 2）终止，且不输出问候语。
 
-** 实际结果 **
+**实际结果**
 程序正常输出`Hello,    !`，并以退出码`0`结束
 
 ## 提交信息
 
-** 标题：`fix(cli): reject blank names with non-zero exit code` **
+**标题：`fix(cli): reject blank names with non-zero exit code`**
 正文：
 当前`argparse`会将仅含空格的字符串视为合法值，导致无效输入继续执行。
 在解析后增加`strip()`校验，若`name`为空则调用`sys.exit(2)`，确保与标准CLI工具的行为一致。

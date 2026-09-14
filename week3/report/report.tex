@@ -1,0 +1,210 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{minted}
+\usepackage[htt]{hyphenat}
+\usepackage[UTF8]{ctex}
+
+\hypersetup{
+  colorlinks=true,
+  allcolors=blue,
+  pdfstartview=Fit,
+  breaklinks=true
+}
+
+\newcommand{\figph}[2][0.8\textwidth]{%
+  \IfFileExists{figures/#2}%
+    {\includegraphics[width=#1]{figures/#2}}%
+    {\fbox{\parbox[c][4cm][c]{0.75\textwidth}{\centering\ttfamily [图片占位符]\quad\detokenize{figures/#2}}}}%
+}
+
+\sloppy
+
+\begin{document}
+  \title{系统开发工具基础 \\ 第三周实验报告}
+  \author{乔海轩—25090012035}
+  \date{2026年9月7日}
+  \maketitle
+
+  \tableofcontents
+  \newpage
+
+  \section{总览}
+    \begin{table}[h]
+      \centering
+      \begin{tabular}{|l|l|c|}
+        \hline
+        题目编号 & 描述 & 完成情况 \\
+        \hline
+        9 & 从源码构建并在干净环境安装 Wheel & 已完成 \\
+        10 & 让编程智能体进入可验证的修复循环 & 已完成 \\
+        11 & 把“无法处理”的协作材料改成可执行信息 & 已完成 \\
+        12 & 修复一个可复现的线性回归训练循环 & 已完成 \\
+        \hline
+      \end{tabular}
+    \end{table}
+    Github 仓库地址：\href{https://github.com/Ptilotsis-o/system-dev-tools/}{https://github.com/Ptilotsis-o/system-dev-tools/}
+    \newline Commit记录如图\ref{fig:commit}所示。
+    \begin{figure}[h]
+      \centering
+      \figph{commit.png}
+      \caption{Commit记录截图}
+      \label{fig:commit}
+    \end{figure}
+
+  \newpage
+  \section{第 9 题 从源码构建并在干净环境安装 Wheel}
+    \subsection*{题目要求}
+      \begin{itemize}
+        \item 创建 src/greetlab/\_\_init\_\_.py、给定的 cli.py 和 pyproject.toml，并把“学号”替换为自己的学号。
+        \item 在已安装 build 工具的课程环境中运行 python -m build，生成 wheel。
+        \item 新建一个干净虚拟环境，只从生成的 wheel 安装。
+        \item 切换到 q09 之外运行 sdt-greet --name <学号>，确认输出正确。
+      \end{itemize}
+    \subsection*{操作步骤与命令}
+      \begin{minted}{bash}
+        mkdir -p q09/src/greetlab
+        vim q09/src/greetlab/__init__.py
+        vim q09/src/greetlab/cli.py
+        vim q09/pyproject.toml
+        cd q09
+        python -m build
+        python -m venv env
+        source env/bin/activate
+        pip install dist/greetlab_25090012035-0.1.0-py3-none-any.whl
+        cd ..
+        sdt-greet --name 25090012035
+      \end{minted}
+    \subsection*{结果验证}
+      \begin{itemize}
+        \item 三个文件创建完成，pyproject.toml 中的包名为 \allowbreak\texttt{greetlab-25090012035}；
+        \item \texttt{python -m build} 执行成功，dist/ 下生成 \texttt{greetlab\_25090012035-0.1.0-py3-none-any.whl}；
+        \item 新建的虚拟环境只安装了该 wheel，未从源码路径安装；
+        \item 在 q09 之外运行 \allowbreak\texttt{sdt-greet --name 25090012035}，输出 \allowbreak\texttt{Hello, 25090012035!}。
+      \end{itemize}
+      \begin{figure}[h]
+        \centering
+        \figph{greet.png}
+        \caption{在 q09 之外运行 sdt-greet 输出截图}
+        \label{fig:greet}
+      \end{figure}
+
+  \newpage
+  \section{第 10 题 让编程智能体进入可验证的修复循环}
+    \subsection*{题目要求}
+      \begin{itemize}
+        \item 复制 q09 为 q10，添加一个失败测试：当 name 只含空白字符时，main 应以 SystemExit(2) 结束。
+        \item 先运行测试确认失败，再向编程智能体说明目标、约束和测试命令，要求它修改实现并运行测试。
+        \item 人工检查 diff，撤销无关修改，并再次运行测试。
+        \item 在 ai\_log.md 中用不超过 5 行记录核心提示、智能体改动和人工验证。
+      \end{itemize}
+    \subsection*{操作步骤与命令}
+      \begin{minted}{bash}
+        cp -r q09 q10
+        mkdir -p q10/tests
+        vim q10/tests/test_cli.py 
+        cd q10
+        pytest tests/test_cli.py -v
+        # 向编程智能体说明目标、约束与测试命令，由智能体修改 src/greetlab/cli.py
+        git diff          
+        pytest tests/test_cli.py -v
+        vim ai_log.md
+      \end{minted}
+    \subsection*{结果验证}
+      \begin{itemize}
+        \item 新增的 \texttt{test\_blank\_name\_exits} 初次运行失败（\texttt{DID NOT RAISE SystemExit}）；
+        \item 智能体仅修改了 \texttt{src/greetlab/cli.py}，加入 \texttt{import sys} 与空白校验，\texttt{git diff} 中无无关改动；
+        \item 再次运行 \texttt{pytest} 通过，正常姓名输入的行为未受影响；
+        \item ai\_log.md 用 3 行记录核心提示、智能体改动与人工验证，未超过 5 行。
+      \end{itemize}
+      \begin{figure}[h]
+        \centering
+        \figph{fail.png}
+        \caption{添加失败测试后初次运行 pytest 截图}
+        \label{fig:fail}
+      \end{figure}
+      \begin{figure}[h]
+        \centering
+        \figph{diff.png}
+        \caption{智能体改动后的 git diff 截图}
+        \label{fig:diff}
+      \end{figure}
+      \begin{figure}[h]
+        \centering
+        \figph{pass.png}
+        \caption{pytest 通过截图}
+        \label{fig:pass}
+      \end{figure}
+
+  \newpage
+  \section{第 11 题 把“无法处理”的协作材料改成可执行信息}
+    \subsection*{题目要求}
+      \begin{itemize}
+        \item 在 communication.md 中重写 Issue，包含环境、复现命令、期望结果和实际结果；未知信息写“待确认”。
+        \item 重写提交信息：标题使用祈使语气，正文说明问题和解决方案。
+        \item 重写评审意见：指出具体行为、风险和建议动作，并标注 Blocking、Suggestion 或 Nit。
+        \item 全文控制在 400 字以内，保持专业、简洁。
+      \end{itemize}
+    \subsection*{操作步骤与命令}
+      \begin{minted}{bash}
+        vim communication.md
+        wc -m communication.md
+      \end{minted}
+    \subsection*{结果验证}
+      \begin{itemize}
+        \item Issue 部分包含环境（操作系统“待确认”、Python 版本“待确认”、包版本 greetlab\_25090012035-0.1.0）、复现命令 \texttt{sdt-greet --name "   "}、期望结果与实际结果；
+        \item 提交信息标题为祈使语气 \allowbreak\texttt{fix(cli): reject blank names with non-zero exit code}，正文分别说明问题与解决方案；
+        \item 评审意见指出具体行为（未校验 --name）、潜在风险（退出码掩盖调用错误）与建议动作，并标注 \texttt{Blocking}；
+        \item 全文 400 字以内，无“尽快修复”“写得不好”等无法执行的信息。
+      \end{itemize}
+
+  \newpage
+  \section{第 12 题 修复一个可复现的线性回归训练循环}
+    \subsection*{题目要求}
+      \begin{itemize}
+        \item 补全训练循环，正确调用 zero\_grad、backward 和 step。
+        \item 训练后调用 model.eval()，并在 torch.no\_grad() 中计算最终损失。
+        \item 打印最终损失、weight 和 bias；最终损失应小于 0.001。
+        \item 不得直接把 weight 和 bias 赋值为 3 和 -1。
+      \end{itemize}
+    \subsection*{操作步骤与命令}
+      \begin{minted}{bash}
+        vim train.py  
+        python train.py
+      \end{minted}
+    \subsection*{结果验证}
+      \begin{itemize}
+        \item 训练循环中每个迭代依次调用 \texttt{opt.zero\_grad()}、\texttt{loss.backward()}、\texttt{opt.step()}，顺序正确；
+        \item 训练结束后调用 \texttt{model.eval()}，并在 \texttt{with torch.no\_grad():} 中计算最终损失；
+        \item 打印出的最终损失小于 0.001，weight 与 bias 分别收敛到接近 3 和 -1 的值；
+        \item 代码中未对 weight 和 bias 直接赋值，两个参数完全由梯度下降更新得到。
+      \end{itemize}
+      \begin{figure}[h]
+        \centering
+        \figph{train.png}
+        \caption{train.py 代码与运行输出截图}
+        \label{fig:train}
+      \end{figure}
+
+  \iffalse
+  \newpage
+  \section{课后作业}
+    \subsection{q1: 待补充}
+    待补充
+      \begin{minted}{bash}
+        # 待补充
+      \end{minted}
+    \subsection{课后作业commit记录}
+      \begin{figure}[h]
+        \centering
+        \figph{homework_commit.png}
+        \caption{课后作业commit记录}
+        \label{fig:homework_commit}
+      \end{figure}
+
+  \section{解题感悟}
+    待补充
+
+  \fi
+\end{document}
