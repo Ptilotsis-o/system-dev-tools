@@ -187,14 +187,149 @@
         \label{fig:train}
       \end{figure}
 
-  \iffalse
   \newpage
   \section{课后作业}
-    \subsection{q1: 待补充}
-    待补充
-      \begin{minted}{bash}
-        # 待补充
-      \end{minted}
+    \newpage
+  \section{课后作业}
+    \subsection{q1: 公里转英里 CLI 包}
+    目标：创建 \texttt{unitconv} 包，提供命令 \texttt{sdt-km2mi}，接受 \texttt{--km} 参数，输出对应英里数并保留两位小数；使用 \texttt{pyproject.toml}（setuptools 后端），运行 \texttt{python -m build} 生成 wheel，在干净虚拟环境中安装并运行验证。
+    \begin{minted}{bash}
+      python -m build
+      python -m venv env
+      source env/bin/activate
+      pip install dist/*
+      cd ..
+      sdt-km2mi --km 5
+    \end{minted}
+    \begin{figure}[h]
+      \centering
+      \figph{km2mi.png}
+      \caption{sdt-km2mi 运行截图截图}
+      \label{fig:km2mi}
+    \end{figure}
+    \subsection{q2: 检查 sdist 内容}
+    目标：复用 q1 的包，仅生成源码分发包（sdist）；解压 \texttt{.tar.gz}，将文件列表保存到 \texttt{sdist\_files.txt}，确认其中包含 \texttt{pyproject.toml}、\texttt{src/unitconv/cli.py} 和 \texttt{src/unitconv/\_\_init\_\_.py}。
+    \begin{minted}{bash}
+      python -m build --sdist
+      tar -tzf dist/*.tar.gz > sdist_files.txt
+      cat sdist_files.txt
+    \end{minted}
+    \begin{figure}[h]
+      \centering
+      \figph{sdist_files.png}
+      \caption{sdist\_files.txt 内容截图}
+      \label{fig:sdist_files}
+    \end{figure}
+    \subsection{q3: 用 pip wheel 构建并检查入口点}
+    目标：创建 \texttt{strtool} 包，提供命令 \texttt{sdt-rev}，功能为反转字符串；使用 \texttt{pip wheel . -w dist} 构建 wheel，再用 \texttt{unzip -l} 查看 wheel 内容，并确认 \texttt{entry\_points.txt} 中出现 \texttt{sdt-rev}。
+    \begin{minted}{bash}
+      pip wheel . -w dist
+      unzip -l dist/*.whl
+      unzip -p dist/*.whl '*/entry_points.txt'
+    \end{minted}
+    \begin{figure}[h]
+      \centering
+      \figph{entry_points.png}
+      \caption{entry\_points.txt 内容截图}
+      \label{fig:entry_points}
+    \end{figure}
+    \subsection{q4: 修复除零返回 None}
+    目标：修改 \texttt{divide.py}，使 \texttt{divide(1, 0)} 返回 \texttt{None} 并向 stderr 输出 \texttt{division by zero}；先编写失败测试，再向编程智能体说明目标与测试命令，人工检查 \texttt{diff}，撤销无关改动，最终运行 \texttt{pytest} 通过。
+    \begin{minted}{bash}
+      vim test_divide.py
+      pytest test_divide.py
+      # 与智能体协作，修复 divide.py
+      pytest test_divide.py
+      git diff
+      vim ai_log.md
+    \end{minted}
+    \begin{figure}[h]
+      \centering
+      \figph{wrong1.png}
+      \caption{pytest 运行报错截图}
+      \label{fig:wrong1}
+    \end{figure}
+    \begin{figure}[h]
+      \centering
+      \figph{pass1.png}
+      \caption{pytest 运行通过截图}
+      \label{fig:pass1}
+    \end{figure}
+    \begin{figure}[h]
+      \centering
+      \figph{diff1.png}
+      \caption{diff 内容截图}
+      \label{fig:diff1}
+    \end{figure}
+    \newpage
+    \subsection{q5: 让时长解析支持分钟}
+    目标：修改 \texttt{parse\_duration}，使其支持 \texttt{"1h30m"} 并返回总分钟数 \texttt{90}，同时保持 \texttt{"2h"} 返回 \texttt{120}；编写失败测试，让智能体修复后人工检查并运行测试。
+    \begin{minted}{bash}
+      vim test_parse_duration.py
+      pytest test_parse_duration.py
+      # 与智能体协作，修复 parse_duration.py
+      pytest test_parse_duration.py
+      git diff
+      vim ai_log.md
+    \end{minted}
+    \begin{figure}[h]
+      \centering
+      \figph{wrong2.png}  
+      \caption{pytest 运行报错截图}
+      \label{fig:wrong2}
+    \end{figure}
+    \begin{figure}[h]
+      \centering
+      \figph{pass2.png}
+      \caption{pytest 运行通过截图}
+      \label{fig:pass2}
+    \end{figure}
+    \begin{figure}[h]
+      \centering
+      \figph{diff2.png}
+      \caption{diff 内容截图}
+      \label{fig:diff2}
+    \end{figure}
+    \newpage
+    \subsection{q6: 负数 count 的 Issue/提交/评审}
+    目标：针对缺陷“CLI 的 \texttt{--count -1} 时循环不执行，但退出码为 0”，在 \texttt{communication.md} 中撰写 Issue（含环境、复现命令、期望结果、实际结果，未知写“待确认”）、提交信息（标题用祈使句，正文说明问题与方案）和评审意见（指出行为、风险、建议动作，标注 Blocking/Suggestion/Nit），全文不超过 400 字。
+    \begin{minted}{bash}
+      vim communication.md
+    \end{minted}
+    \subsection{q7: README 缺少 Windows 安装步骤的 PR 描述}
+    目标：针对“README 只写了 macOS/Linux 安装步骤，Windows 用户无法照做”，撰写一段 PR 描述，包含问题、修改方案、验证方式和潜在风险，保存为 \texttt{pr\_description.md}，不超过 250 字。
+    \begin{minted}{bash}
+      vim pr_description.md
+    \end{minted}
+    \subsection{q8: 返回类型标注错误的评审意见}
+    目标：针对代码 \texttt{def add(a, b) -> int: return a + b}，但调用 \texttt{add(1.5, 2)} 会返回 \texttt{float} 的问题，撰写评审意见，指出具体行为、风险和建议动作，并标注 Blocking、Suggestion 或 Nit，保存为 \texttt{review.md}，不超过 200 字。
+    \begin{minted}{bash}
+      vim review.md
+    \end{minted}
+    \subsection{q9: 拟合 y = 2x + 5}
+    目标：用 PyTorch 拟合 \texttt{y = 2x + 5}；使用 \texttt{nn.Linear(1, 1)}、\texttt{MSELoss}、\texttt{SGD(lr=0.05)}，训练 300 步，补全 \texttt{zero\_grad()}、\texttt{backward()}、\texttt{step()}；训练后调用 \texttt{model.eval()}，在 \texttt{torch.no\_grad()} 中打印最终 loss、weight、bias；最终 loss 小于 \texttt{0.001}，不得直接赋值 weight/bias。
+    \begin{minted}{bash}
+      vim train.py
+      python train.py
+    \end{minted}
+    \begin{figure}[h]
+      \centering
+      \figph{train_loss1.png}
+      \caption{训练损失截图}
+      \label{fig:train_loss1}
+    \end{figure}
+    \subsection{q10: 小网络拟合 y = x²}
+    目标：用 PyTorch 拟合 \texttt{y = x²}；使用 \texttt{nn.Sequential(nn.Linear(1, 8), nn.ReLU(), nn.Linear(8, 1))}，优化器用 \texttt{Adam(lr=0.01)}，训练 500 步；补全训练循环，并在 \texttt{eval()} + \texttt{no\_grad()} 下打印最终 loss；最终 loss 小于 \texttt{0.05}，不得直接把网络权重写成解析解。
+    \begin{minted}{bash}
+      vim train.py
+      python train.py
+    \end{minted}
+    \begin{figure}[h]
+      \centering
+      \figph{train_loss2.png}
+      \caption{训练损失截图}
+      \label{fig:train_loss2}
+    \end{figure}
     \subsection{课后作业commit记录}
       \begin{figure}[h]
         \centering
@@ -204,7 +339,6 @@
       \end{figure}
 
   \section{解题感悟}
-    待补充
+    本次实验报告聚焦第三周内容，涵盖 Python 打包与 Wheel 安装、智能体编程与测试驱动修复、协作材料撰写以及 PyTorch 训练循环。通过动手实践，我掌握了从源码构建、干净环境验证到质量门禁的完整流程，也学会了向智能体清晰描述问题并人工审查改动。课后作业进一步巩固了 CLI 打包、除零修复、时长解析、回文判断、Issue/评审写作及线性/非线性回归。这次实验让我对打包发布、人机协作和深度学习训练有了更系统的认识。
 
-  \fi
 \end{document}
