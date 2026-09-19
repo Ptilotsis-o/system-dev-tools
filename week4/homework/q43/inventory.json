@@ -1,0 +1,8 @@
+[
+  {"name": "apple", "category": "fruit", "price": 5.0, "stock": 8},
+  {"name": "banana", "category": "fruit", "price": 3.0, "stock": 20},
+  {"name": "chair", "category": "furniture", "price": 45.0, "stock": 5},
+  {"name": "desk", "category": "furniture", "price": 120.0, "stock": 3},
+  {"name": "pen", "category": "stationery", "price": 1.5, "stock": 50},
+  {"name": "notebook", "category": "stationery", "price": 2.0, "stock": 7}
+]
