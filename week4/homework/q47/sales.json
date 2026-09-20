@@ -1,0 +1,7 @@
+[
+  {"region": "North", "product": "A", "amount": 500},
+  {"region": "South", "product": "B", "amount": 300},
+  {"region": "North", "product": "C", "amount": 1000},
+  {"region": "South", "product": "D", "amount": 900},
+  {"region": "East", "product": "E", "amount": 200}
+]
