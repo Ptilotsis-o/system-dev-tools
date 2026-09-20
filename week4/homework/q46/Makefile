@@ -1,6 +1,6 @@
 .PHONY: all clean
 
-SRCS := $(wildcard images/*.txt)
+SRCS := $(filter-out %.thumb.txt,$(wildcard images/*.txt))
 THUMBS := $(SRCS:.txt=.thumb.txt)
 
 all: $(THUMBS)
