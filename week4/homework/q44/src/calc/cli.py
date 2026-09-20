@@ -12,3 +12,7 @@ def main():
     else:
         result = args.a - args.b
     print(result)
+
+
+if __name__ == "__main__":
+    main()
