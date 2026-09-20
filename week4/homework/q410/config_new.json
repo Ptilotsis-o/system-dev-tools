@@ -1,0 +1,14 @@
+[
+  {
+    "name": "service-a",
+    "version": 2
+  },
+  {
+    "name": "service-b",
+    "version": 3
+  },
+  {
+    "name": "service-c",
+    "version": 2
+  }
+]

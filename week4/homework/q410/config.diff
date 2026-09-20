@@ -1,0 +1,20 @@
+--- config.json	2026-09-21 00:24:11.646940961 +0800
++++ config_new.json	2026-09-21 00:27:35.531219180 +0800
+@@ -1,5 +1,14 @@
+ [
+-  {"name": "service-a", "version": 1},
+-  {"name": "service-b", "version": 2},
+-  {"name": "service-c", "version": 1}
++  {
++    "name": "service-a",
++    "version": 2
++  },
++  {
++    "name": "service-b",
++    "version": 3
++  },
++  {
++    "name": "service-c",
++    "version": 2
++  }
+ ]
