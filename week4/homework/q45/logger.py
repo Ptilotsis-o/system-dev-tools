@@ -1,4 +1,4 @@
 import logging
 
 def log_message(msg: str) -> None:
-    print(f"LOG: {msg}")   # 待替换
+    logging.info(f"LOG: {msg}")   # 待替换
