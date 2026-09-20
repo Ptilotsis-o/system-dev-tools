@@ -1,0 +1,5 @@
+[
+  {"name": "service-a", "version": 1},
+  {"name": "service-b", "version": 2},
+  {"name": "service-c", "version": 1}
+]
