@@ -1,5 +1,7 @@
 [tool.mypy]
 strict = true
+mypy_path = "."
+exclude = ["build/"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
