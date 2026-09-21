@@ -248,24 +248,294 @@
         \label{fig:q16commit}
       \end{figure}
 
-  \iffalse
   \newpage
   \section{课后作业}
-    \subsection{q1: 待补充}
-    待补充
+    \subsection*{q1: 为字符串工具包建立质量门禁}
+    目标：创建一个字符串工具包，实现字符串反转和回文判断功能；配置 ruff 和 pytest；编写 check.sh，依次运行 ruff format --check、ruff check 和 pytest，确保代码格式、静态检查和单元测试全部通过且返回 0。
       \begin{minted}{bash}
-        # 待补充
+        vim pyproject.toml
+        pip install -e .
+        vim check.sh
+        chmod +x check.sh
+        ./check.sh
+        echo $?
       \end{minted}
-    \subsection{课后作业commit记录}
+      \subsubsection*{结果验证}
+        \begin{itemize}
+          \item \texttt{reverse()} 实现字符串反转（\texttt{"abc" → "cba"}），\texttt{is\_palindrome()} 实现回文判断（忽略大小写和空格）；
+          \item ruff 配置了 line-length = 88，lint select 为 E、F、W，无全局忽略规则；pytest 配置 testpaths 为 tests；
+          \item check.sh 返回 0，ruff format --check、ruff check 与 pytest 全部通过，三个测试均通过。
+        \end{itemize}
+        \begin{figure}[h]
+          \centering
+          \figph{check1.png}
+          \caption{q1 check.sh 测试通过截图}
+          \label{fig:homework-check}
+        \end{figure}
+    \subsection*{q2: 用 Makefile 构建 Markdown 文档流水线}
+    目标：创建多个 Markdown 章节文件，用 Python 脚本合并并生成目录；编写 Makefile 管理文件依赖，实现首次构建生成最终文档，无改动时不重复执行，修改源文件后触发级联重建，并能通过 clean 目标只删除生成物。
+      \begin{minted}{bash}
+        vim Makefile
+        make
+        make
+        touch chapter1.md
+        make
+        make clean
+      \end{minted}
+      \subsubsection*{结果验证}
+        \begin{itemize}
+          \item \texttt{combine.py} 合并所有 chapter*.md 生成 book.md，\texttt{toc.py} 提取标题生成目录插入后得到 final.md；
+          \item \texttt{make} 第一次构建生成 book.md 和 final.md，第二次构建提示 \texttt{'final.md' is up to date}，不重复执行；
+          \item \texttt{touch chapter1.md} 后，\texttt{make} 级联重建 book.md 和 final.md，时间戳更新；
+          \item \texttt{make clean} 仅删除 book.md 和 final.md，源文件与脚本保留。
+        \end{itemize}
+        \begin{figure}[h]
+          \centering
+          \figph{make1.png}
+          \caption{q2 第一和第二次 make 输出结果截图}
+          \label{fig:homework-make1}
+        \end{figure}
+        \begin{figure}[h]
+          \centering
+          \figph{make2.png}
+          \caption{q2 \texttt{touch chapter1.md} 后 make 输出结果截图}
+          \label{fig:homework-make2}
+        \end{figure}
+    \subsection*{q3: 用 jq 生成 CSV 报告}
+    目标：创建商品库存 JSON 文件，启动本地 HTTP 服务；编写脚本用 curl 获取数据，通过 jq 筛选出库存小于 10 的商品，按价格降序排列，输出为包含表头的 CSV 文件。
+      \begin{minted}{bash}
+        vim inventory.json
+        vim report.sh
+        chmod +x report.sh
+        python -m http.server 8080 &
+        ./report.sh
+        cat inventory_low.csv
+        kill %1
+      \end{minted}
+      \subsubsection*{结果验证}
+        \begin{itemize}
+          \item \texttt{report.sh} 通过 curl 获取 JSON，用 jq 筛选 \texttt{stock < 10} 的记录，按 price 降序排列，输出带表头的 CSV；
+          \item 筛选结果：desk（stock=3, price=120.0）、chair（stock=5, price=45.0）、apple（stock=8, price=5.0）、notebook（stock=7, price=2.0），共 4 条记录，按价格降序排列正确。
+        \end{itemize}
+        \begin{figure}[h]
+          \centering
+          \figph{jq.png}
+          \caption{q3 report.sh 输出结果截图}
+          \label{fig:homework-jq}
+        \end{figure}
+    \subsection*{q4: 修复并打包一个小型计算器 CLI}
+    目标：创建一个计算器命令行工具，故意在减法操作中植入加法缺陷；通过测试发现失败并修复；编写 Makefile 管理 check 和 build；构建 wheel 并计算 SHA-256；初始化 Git 并提交最终修复。
+      \begin{minted}{bash}
+        mkdir -p src/calc tests
+        vim src/calc/cli.py          # 减法故意写为加法
+        vim tests/test_cli.py
+        vim pyproject.toml
+        pip install -e .
+        pytest -v                     # test_sub 失败
+        vim src/calc/cli.py           # 修复为 args.a - args.b
+        pytest -v
+        vim Makefile check.sh
+        make check
+        make build
+        sha256sum dist/calc_25090012035-0.1.0-py3-none-any.whl
+        # git init && git add -A && git commit -m "fix(calc): restore subtraction"
+      \end{minted}
+      \subsubsection*{结果验证}
+        \begin{itemize}
+          \item 首次运行 pytest，\texttt{test\_sub} 输出 \texttt{3.0}（实际应为 5+2=7.0），断言失败；
+          \item 修复减法为 \texttt{args.a - args.b} 后，\texttt{test\_add} 和 \texttt{test\_sub} 全部通过；
+          \item \texttt{make check} 运行 check.sh（ruff format --check、ruff check、pytest）全部通过，返回 0；
+          \item \texttt{make build} 生成 \texttt{calc\_25090012035-0.1.0-py3-none-any.whl}，SHA-256 计算成功；
+          \item Git 提交信息为 \texttt{fix(calc): restore subtraction}，内容聚焦。
+        \end{itemize}
+        \begin{figure}[h]
+          \centering
+          \figph{wrong.png}
+          \caption{q4 测试失败}
+          \label{fig:homework-wrong}
+        \end{figure}
+        \begin{figure}[h]
+          \centering
+          \figph{calc.png}
+          \caption{q4 测试修复}
+          \label{fig:homework-calc}
+        \end{figure}
+        \begin{figure}[h]
+          \centering
+          \figph{hash.png}
+          \caption{q4 构建 wheel SHA-256 计算结果}
+          \label{fig:homework-hash}
+        \end{figure}
+    \subsection*{q5: 禁止 print 的质量门禁}
+    目标：创建一个日志工具模块，其中使用 print 输出；配置 ruff 启用 T201 规则禁止 print；将 print 替换为 logging；编写测试并集成到 check.sh，确保 ruff 检查和 pytest 全部通过。
+      \begin{minted}{bash}
+        vim logger.py                  # 先使用 print 输出
+        ruff check .                   # 触发 T201 报错
+        vim logger.py                  # 将 print 替换为 logging.info
+        vim tests/test_logger.py
+        vim pyproject.toml
+        vim check.sh
+        chmod +x check.sh
+        ./check.sh
+        echo $?
+      \end{minted}
+      \subsubsection*{结果验证}
+        \begin{itemize}
+          \item 初始 \texttt{print(msg)} 被 ruff T201 规则检测并报错；
+          \item 替换为 \texttt{logging.info(f"LOG: \{msg\}")} 后，ruff 检查通过；
+          \item \texttt{test\_log} 使用 caplog fixture 验证日志输出，pytest 通过；
+          \item check.sh 返回 0，ruff 检查与 pytest 全部通过。
+        \end{itemize}
+        \begin{figure}[h]
+          \centering
+          \figph{ruff1.png}
+          \caption{q5 ruff 检查失败}
+          \label{fig:homework-ruff}
+        \end{figure}
+        \begin{figure}[h]
+          \centering
+          \figph{print.png}
+          \caption{q5 check.sh 测试通过截图}
+          \label{fig:homework-print}
+        \end{figure}
+    \subsection*{q6: Makefile 管理图片缩略图生成}
+    目标：创建多个 txt 文件，编写缩略图生成脚本；使用 Makefile 的模式规则为每个 txt 文件生成对应的 thumb.txt；实现首次全部生成，新增文件后只生成新增的缩略图，并通过 clean 删除所有缩略图。
+      \begin{minted}{bash}
+        mkdir images
+        vim images/a.txt images/b.txt images/c.txt
+        vim thumbnail.py
+        vim Makefile
+        make                    # 首次生成所有缩略图
+        make                    # 无改动不执行
+        vim images/d.txt
+        make                    # 只生成 d.thumb.txt
+        make clean              # 删除所有 .thumb.txt
+      \end{minted}
+      \subsubsection*{结果验证}
+        \begin{itemize}
+          \item \texttt{thumbnail.py} 读取源 txt 文件，生成以 \texttt{THUMB: } 为前缀的缩略文件；
+          \item Makefile 使用模式规则 \texttt{\%.thumb.txt: \%.txt}，准确列出依赖；
+          \item 首次 \texttt{make} 生成 a.thumb.txt、b.thumb.txt、c.thumb.txt；
+          \item 第二次 \texttt{make} 不执行任何配方；新增 d.txt 后只生成 d.thumb.txt；
+          \item \texttt{make clean} 仅删除 images/*.thumb.txt，源文件保留。
+        \end{itemize}
+        \begin{figure}[h]
+          \centering
+          \figph{thumb1.png}
+          \caption{q6 第一次缩略图生成结果截图}
+          \label{fig:homework-thumb1}
+        \end{figure}
+        \begin{figure}[h]
+          \centering
+          \figph{thumb2.png}
+          \caption{q6 第二次缩略图生成结果截图}
+          \label{fig:homework-thumb2}
+        \end{figure}
+    \subsection*{q7: jq 分组统计并输出 Markdown 列表}
+    目标：创建销售记录 JSON 文件，使用 jq 按地区分组统计总销售额，按总销售额降序排列，输出为 Markdown 列表格式并保存为 sales\_summary.md。
+      \begin{minted}{bash}
+        vim sales.json
+        vim summarize.sh
+        chmod +x summarize.sh
+        ./summarize.sh
+        cat sales_summary.md
+      \end{minted}
+      \subsubsection*{结果验证}
+        \begin{itemize}
+          \item \texttt{summarize.sh} 使用 jq 的 \texttt{group\_by(.region)} 按地区分组，\texttt{map(.amount) | add} 求和，\texttt{sort\_by(-.total)} 降序排列；
+          \item 输出结果：North（1500）、South（1200）、East（200），格式为 Markdown 无序列表 \texttt{- region: total}；
+          \item sales\_summary.md 内容与预期一致。
+        \end{itemize}
+        \begin{figure}[h]
+          \centering
+          \figph{summary1.png}
+          \caption{q7 sales\_summary.md 内容截图}
+          \label{fig:homework-sales}
+        \end{figure}
+    \subsection*{q8: 增加 mypy 类型检查到质量门禁}
+    目标：创建一个小型数学库，故意写错类型注解；配置 mypy 和 pytest；编写 check.sh 依次运行 mypy、ruff check 和 pytest；修复类型错误后确保所有检查通过。
+      \begin{minted}{bash}
+        vim mathlib.py               # 故意写错类型注解
+        vim tests/test_mathlib.py
+        vim pyproject.toml
+        mypy .                       # 触发类型错误
+        vim mathlib.py               # 修复注解
+        mypy .                       # 通过
+        vim check.sh
+        chmod +x check.sh
+        ./check.sh
+        echo $?
+      \end{minted}
+      \subsubsection*{结果验证}
+        \begin{itemize}
+          \item \texttt{mathlib.py} 中 \texttt{add(a: int, b: int) -> int} 故意写错（如 b 类型错误），mypy 检测到类型不匹配并报错；
+          \item 修复后 mypy 通过，无任何类型错误；
+          \item check.sh 依次执行 mypy、ruff check、pytest，全部通过并返回 0。
+        \end{itemize}
+        \begin{figure}[h]
+          \centering
+          \figph{mypy.png}
+          \caption{q8 check.sh 测试通过截图}
+          \label{fig:homework-mypy}
+        \end{figure}
+    \subsection*{q9: Makefile 构建 Python wheel 并运行测试}
+    目标：创建一个简单 Python 包，编写 Makefile，定义 all 目标生成 wheel，test 目标运行测试，clean 目标清理生成物；实现首次构建生成 wheel，无改动时不重复构建，并确保测试通过。
+      \begin{minted}{bash}
+        mkdir -p src/demo tests
+        vim src/demo/core.py
+        vim tests/test_core.py
+        vim pyproject.toml
+        vim Makefile
+        make                 # 首次构建生成 wheel
+        make                 # 无改动不重复构建
+        make test            # 运行测试
+        make clean           # 清理生成物
+      \end{minted}
+      \subsubsection*{结果验证}
+        \begin{itemize}
+          \item \texttt{src/demo/core.py} 实现 \texttt{greet(name) → "Hello, \{name\}!"}，pytest 测试通过；
+          \item Makefile 中 all 依赖 \texttt{dist/demo-0.1.0-py3-none-any.whl}，依赖 src/demo/core.py 和 pyproject.toml；
+          \item 首次 \texttt{make} 构建生成 wheel；第二次 \texttt{make} 提示 up to date，不重复执行；
+          \item \texttt{make test} 先构建 wheel 再运行 pytest，全部通过；
+          \item \texttt{make clean} 删除 dist、build、*.egg-info 和 \_\_pycache\_\_。
+        \end{itemize}
+        \begin{figure}[h]
+          \centering
+          \figph{wheel.png}
+          \caption{q9 测试通过截图}
+          \label{fig:homework-wheel}
+        \end{figure}
+    \subsection*{q10: jq 修改 JSON 并生成差异报告}
+    目标：创建配置文件 JSON，使用 jq 将所有版本号加 1 生成新文件；用 diff 生成差异报告文件；编写脚本封装该流程，并确保脚本最终返回 0。
+      \begin{minted}{bash}
+        vim config.json
+        vim update_versions.sh
+        chmod +x update_versions.sh
+        ./update_versions.sh
+        cat config.diff
+        echo $?
+      \end{minted}
+      \subsubsection*{结果验证}
+        \begin{itemize}
+          \item \texttt{update\_versions.sh} 使用 \texttt{jq 'map(.version += 1)'} 将每个服务的版本号加 1，输出到 config\_new.json；
+          \item config.diff 正确展示版本号变更（service-a: 1→2, service-b: 2→3, service-c: 1→2）以及 JSON 格式化差异；
+          \item 脚本最终返回 0，流程完整。
+        \end{itemize}
+        \begin{figure}[h]
+          \centering
+          \figph{diff.png}
+          \caption{q10 config.diff 差异报告截图}
+          \label{fig:homework-diff}
+        \end{figure}
+    \subsection*{课后作业 commit 记录}
       \begin{figure}[h]
         \centering
         \figph{homework_commit.png}
-        \caption{课后作业commit记录}
+        \caption{课后作业 commit 记录}
         \label{fig:homework_commit}
       \end{figure}
 
   \section{解题感悟}
-    待补充
+    本次实验报告围绕第四周的工程化实践展开，涵盖了代码质量门禁、Makefile 增量构建、jq 数据处理以及 Git 综合交付。通过完成课后作业，我不仅掌握了 ruff、pytest、mypy 等工具的配置与集成，还理解了依赖管理、自动化检查和数据流水线的设计思路。在综合实例中，我进一步锻炼了从修复缺陷到构建 wheel、计算哈希并提交版本的全流程能力。总的来说，这次实践让我对开发工具链的协同工作有了更具体的认识，也为今后规范化交付项目积累了经验。
 
-  \fi
 \end{document}
